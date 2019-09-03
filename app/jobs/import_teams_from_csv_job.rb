@@ -17,22 +17,22 @@ class ImportTeamsFromCsvJob < ApplicationJob
     @created = 0
     @updated = 0
     json_data.each do |entry|
-      manager = { "first_name": entry[:manager_first_name],
-                  "last_name": entry[:manager_last_name],
-                  "age": entry[:manager_age]}
+      manager = construct_manager(entry)
       entry.except!(:manager_first_name, :manager_last_name, :manager_age)
       entry[:manager_attributes] = manager
       team = Team.find_by(name: entry[:name])
       if team.blank?
         team = Team.new(entry)
-        if team.save
-          @created = @created + 1
-        end
-      else
-        if team.update(entry)
-          @updated = @updated + 1
-        end
+        @created += 1 if team.save
+      elsif team.update(entry)
+        @updated += 1
       end
     end
+  end
+
+  def construct_manager(entry)
+    { "first_name": entry[:manager_first_name],
+      "last_name": entry[:manager_last_name],
+      "age": entry[:manager_age] }
   end
 end

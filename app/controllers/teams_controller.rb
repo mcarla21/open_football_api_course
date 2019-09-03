@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class TeamsController < ApplicationController
-  before_action :set_team, only: %i[update show destroy download_logo]
+  before_action :set_team, only: %i[update show destroy download_logo multiple_sizes_of_logos]
 
   def index
     @teams = Team.all
@@ -46,6 +46,15 @@ class TeamsController < ApplicationController
   def bulk_action
     data = File.read(bulk_params[:csv_file].path)
     ImportTeamsFromCsvJob.perform_later(data)
+  end
+
+  def multiple_sizes_of_logos
+    @modified_logos = []
+    @team.logos.each do |logo|
+      @modified_logos << { logo_100: logo.variant(resize: '100x100'),
+                           logo_600: logo.variant(resize: '600x600'),
+                           logo_1024_768: logo.variant(resize: '1024x768') }
+    end
   end
 
   private
