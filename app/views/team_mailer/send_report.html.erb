@@ -1,0 +1,16 @@
+<table>
+  <thead>
+    <tr>
+      <td>Name</td>
+      <td>Manager</td>
+    </tr>
+  </thead>
+  <tbody>
+    <% @teams.each do |team| %>
+      <tr>
+        <td><%= team.name %></td>
+        <td><%= team.manager&.name%></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
